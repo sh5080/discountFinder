@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mysql2": "^3.5.2",
+    "node": "^20.4.0",
+    "prettier": "^3.0.0"
+  },
+  "name": "discount_finder",
+  "version": "1.0.0",
+  "description": "특가 비교 프로젝트",
+  "main": "src/index.js",
+  "repository": "https://github.com/sh5080/discountFinder",
+  "author": "김승환 <prpn97@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  }
+}
