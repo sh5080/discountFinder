@@ -1,16 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import mysql from 'mysql2/promise';
-// import { errorHandler } from './middlewares/errorHandler.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import searchRoutes from './routers/searchRoutes.js';
+import { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, PORT } from './middlewares/config.js';
 
 const app = express();
-// env
-dotenv.config();
-const port = process.env.PORT || 3000;
-export const key = process.env.KEY;
 
-const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
 //db 연결
 export let db;
 export const dbLoader = async () => {
@@ -51,11 +47,13 @@ async function startServer() {
 
     app.set(db);
 
-    // app.use(errorHandler);
+    app.use('/search', searchRoutes);
+
+    app.use(errorHandler);
 
     // 서버 시작
-    app.listen(port, () => {
-      console.log(`Server started on port ${port}`);
+    app.listen(PORT, () => {
+      console.log(`Server started on PORT ${PORT}`);
     });
   } catch (error) {
     console.error('Failed to start the server:', error);
