@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>특가정보 비교 사이트</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>특가정보 비교 사이트</h1>
+        <form class="search-container" id="searchForm">
+            <input type="text" name="keyword" placeholder="검색어를 입력하세요">
+            <button type="submit">검색</button>
+        </form>
+    </header>
+
+    <div class="product-container" id="productContainer">
+        <!-- 여기에 검색 결과가 동적으로 표시될 것입니다. -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const searchForm = document.getElementById('searchForm');
+        const productContainer = document.getElementById('productContainer');
+
+        searchForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(searchForm);
+            const keyword = formData.get('keyword');
+
+            try {
+                const response = await axios.get(`http://localhost:4000/search/naver/${keyword}`, { withCredentials: true });
+                const products = response.data;
+
+                // 검색 결과를 동적으로 표시
+                renderProducts(products);
+            } catch (error) {
+                console.error('데이터를 가져오는 중 오류 발생:', error);
+            }
+        });
+
+        // 검색 결과를 동적으로 표시하는 함수
+        function renderProducts(products) {
+            productContainer.innerHTML = '';
+
+            products.forEach((product) => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+
+                const productImage = document.createElement('img');
+                productImage.src = product.image;
+                productImage.alt = product.title;
+                productImage.classList.add('product-image');
+
+                const productTitle = document.createElement('div');
+                productTitle.classList.add('product-title');
+                productTitle.textContent = product.title;
+
+                const productPrice = document.createElement('div');
+                productPrice.classList.add('product-price');
+                productPrice.textContent = product.price;
+
+                const productDescription = document.createElement('div');
+                productDescription.classList.add('product-description');
+                productDescription.textContent = product.description;
+
+                productCard.appendChild(productImage);
+                productCard.appendChild(productTitle);
+                productCard.appendChild(productPrice);
+                productCard.appendChild(productDescription);
+
+                productContainer.appendChild(productCard);
+            });
+        }
+    </script>
+</body>
+
+</html>
