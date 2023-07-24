@@ -21,7 +21,7 @@ const getEnvNum = (key: string, defaultValue?: number) => {
     return value;
   };
 const config: Config = { 
-    port:getEnvNum('port'), 
+    port:getEnvNum('PORT'), 
     // key:getEnvStr('key'), 
     database:{
         DB_HOST: getEnvStr('DB_HOST'),

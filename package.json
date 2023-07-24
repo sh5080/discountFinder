@@ -12,18 +12,35 @@
   "name": "discount_finder",
   "version": "1.0.0",
   "description": "특가 비교 프로젝트",
-  "main": "src/index.js",
+  "main": "index.js",
   "repository": "https://github.com/sh5080/discountFinder",
   "author": "김승환 <prpn97@gmail.com>",
   "license": "MIT",
-  "type": "module",
+
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc"
+  }
+  ,
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ext": "ts,js",
+    "ignore": [
+      "src/**/*.spec.ts"
+    ],
+    "exec": "ts-node ./src/index.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
-    "@types/node": "^20.4.4"
+    "@types/node": "^20.4.4",
+    "esm": "^3.2.25",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.6.0",
+    "typescript": "^5.1.6"
   }
 }

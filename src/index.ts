@@ -1,5 +1,5 @@
 import express from 'express';
-import config from './config';
+import config from './config/index';
 import expressLoader from './loaders/expressLoader';
 const { port } = config || 3000;
 const app = express();

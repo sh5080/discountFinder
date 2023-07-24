@@ -1,0 +1,13 @@
+import { Request } from 'express';
+
+export interface CustomRequest extends Request {
+  user: string
+  params: {
+    // username: string;
+    keyword: string;
+
+  };
+  body: {
+
+  };
+}
