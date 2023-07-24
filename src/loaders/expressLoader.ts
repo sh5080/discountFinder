@@ -10,7 +10,7 @@ export default async function expressLoader(app: Application): Promise<Applicati
   try {
     const db = await dbLoader();
     const corsOptions = {
-      origin: [''],
+      origin: ['http://127.0.0.1:5500'],
       credentials: true,
     };
     app.use(responseTime)
