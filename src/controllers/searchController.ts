@@ -31,7 +31,6 @@ export const getNaverShoppingData = async(req:Request, res:Response, next:NextFu
   try {
     const API_URL = 'https://openapi.naver.com/v1/search/shop.json';
     const { keyword } = req.params;
-    console.log(keyword);
     const response = await axios.get(API_URL, {
       params: {
         query: keyword,
@@ -39,13 +38,13 @@ export const getNaverShoppingData = async(req:Request, res:Response, next:NextFu
       },
       headers: {
         'X-Naver-Client-Id': CLIENT_ID,
-        'X-Client-Secret': CLIENT_SECRET,
+        'X-Naver-Client-Secret': CLIENT_SECRET,
       },
     });
 
     const result = response.data.items;
 
-    res.json();
+    res.json(result);
   } catch (error) {
     console.error('Error while fetching data:', error);
     next(error);
