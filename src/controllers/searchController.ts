@@ -31,17 +31,21 @@ export const getNaverShoppingData = async(req:Request, res:Response, next:NextFu
   try {
     const API_URL = 'https://openapi.naver.com/v1/search/shop.json';
     const { keyword } = req.params;
+    const { page, pageSize } = req.query;
+    const start = (Number(page)) * Number(pageSize);
     const response = await axios.get(API_URL, {
       params: {
         query: keyword,
-        display: 10, // 검색 결과 개수 설정 (최대 100개)
+        display: pageSize, // 페이지당 결과 개수를 pageSize로 설정
+        start: start, // start 파라미터 추가
       },
       headers: {
         'X-Naver-Client-Id': CLIENT_ID,
         'X-Naver-Client-Secret': CLIENT_SECRET,
       },
     });
-
+    console.log(page)
+    console.log(pageSize)
     const result = response.data.items;
 
     res.json(result);
@@ -51,7 +55,7 @@ export const getNaverShoppingData = async(req:Request, res:Response, next:NextFu
   }
 }
 
-export async function get11stShoppingData(req:Request, res:Response, next:NextFunction) {
+export const get11stShoppingData = async(req:Request, res:Response, next:NextFunction) =>{
   try {
     const { keyword } = req.params; //검색어
     const apiUrl = `https://openapi.11st.co.kr/openapi/OpenApiService.tmall?key=${API_KEY}&apiCode=ProductSearch&keyword=${keyword}`;

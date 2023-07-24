@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>특가정보 비교 사이트</title>
+    <title>특가 파인더</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <header>
-        <h1>특가정보 비교 사이트</h1>
+        <h1>특가 파인더</h1>
         <form class="search-container" id="searchForm">
             <input type="text" name="keyword" placeholder="검색어를 입력하세요">
             <button type="submit">검색</button>
@@ -21,8 +21,20 @@
         <!-- 여기에 검색 결과가 동적으로 표시될 것입니다. -->
     </div>
 
+    <div class="pagination">
+        <button id="prevBtn">이전 페이지</button>
+        <span id="currentPage" class="current-page">1</span> <!-- 현재 페이지를 표시하는 요소 -->
+        <button id="nextBtn">다음 페이지</button>
+    </div>
+
+    <!-- 페이지네이션 버튼들을 보여주는 영역 -->
+    <div class="pagination-buttons" id="paginationButtons"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+        let currentPage = 1; // 현재 페이지 초기화
+        const pageSize = 10; // 페이지당 결과 개수
+
         const searchForm = document.getElementById('searchForm');
         const productContainer = document.getElementById('productContainer');
 
@@ -32,17 +44,89 @@
             const keyword = formData.get('keyword');
 
             try {
-                const response = await axios.get(`http://localhost:4000/search/naver/${keyword}`, { withCredentials: true });
-                const products = response.data;
-
                 // 검색 결과를 동적으로 표시
-                renderProducts(products);
+                await getSearchResults(keyword, currentPage);
             } catch (error) {
                 console.error('데이터를 가져오는 중 오류 발생:', error);
             }
         });
 
+        // 이전 페이지로 이동하는 함수
+        async function goToPreviousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                await getSearchResults(searchForm.keyword.value, currentPage);
+                updateCurrentPageText();
+            }
+        }
+
+        // 다음 페이지로 이동하는 함수
+        async function goToNextPage() {
+            currentPage++;
+            await getSearchResults(searchForm.keyword.value, currentPage);
+            updateCurrentPageText();
+        }
+
+        // 페이지네이션 버튼에 이벤트 리스너 추가
+        document.getElementById('prevBtn').addEventListener('click', goToPreviousPage);
+        document.getElementById('nextBtn').addEventListener('click', goToNextPage);
+
+        // 현재 페이지를 업데이트하는 함수
+        function updateCurrentPageText() {
+            document.getElementById('currentPage').textContent = currentPage;
+        }
+
+        // 페이지네이션 버튼을 동적으로 생성하는 함수
+        function renderPaginationButtons(totalPages) {
+            const paginationButtons = document.getElementById('paginationButtons');
+            paginationButtons.innerHTML = ''; // 기존 버튼 삭제
+
+            const numButtonsToShow = 10; // 페이지네이션 버튼을 10개까지만 보여줌
+            const halfNumButtons = Math.floor(numButtonsToShow / 2);
+            let startPage = Math.max(currentPage - halfNumButtons, 1);
+            let endPage = Math.min(startPage + numButtonsToShow - 1, totalPages);
+
+            if (endPage - startPage < numButtonsToShow - 1) {
+                startPage = Math.max(endPage - numButtonsToShow + 1, 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.addEventListener('click', () => {
+                    currentPage = i;
+                    getSearchResults(searchForm.keyword.value, currentPage);
+                    updateCurrentPageText();
+                    renderPaginationButtons(totalPages); // 페이지 버튼 재생성
+                });
+
+                if (i === currentPage) {
+                    button.classList.add('current-page');
+                }
+
+                paginationButtons.appendChild(button);
+            }
+        }
+
         // 검색 결과를 동적으로 표시하는 함수
+        async function getSearchResults(keyword, page) {
+            try {
+                const response = await axios.get(`http://localhost:4000/search/naver/${keyword}`, {
+                    params: {
+                        page: page,
+                        pageSize: pageSize
+                    },
+                    withCredentials: true
+                });
+
+                const products = response.data;
+                renderProducts(products);
+
+            } catch (error) {
+                console.error('데이터를 가져오는 중 오류 발생:', error);
+            }
+        }
+
         function renderProducts(products) {
             productContainer.innerHTML = '';
 
@@ -57,24 +141,35 @@
 
                 const productTitle = document.createElement('div');
                 productTitle.classList.add('product-title');
-                productTitle.textContent = product.title;
+                productTitle.textContent = product.title.replace(/<\/?b>/g, '');
 
                 const productPrice = document.createElement('div');
                 productPrice.classList.add('product-price');
-                productPrice.textContent = product.price;
+                productPrice.textContent = `최저가 ${product.lprice}원`;
 
                 const productDescription = document.createElement('div');
                 productDescription.classList.add('product-description');
                 productDescription.textContent = product.description;
 
+                const productLink = document.createElement('a');
+                productLink.href = product.link;
+                productLink.textContent = '상품 보러가기';
+                productLink.target = '_blank';
+
                 productCard.appendChild(productImage);
                 productCard.appendChild(productTitle);
                 productCard.appendChild(productPrice);
                 productCard.appendChild(productDescription);
+                productCard.appendChild(productLink);
 
                 productContainer.appendChild(productCard);
             });
         }
+
+        // 첫 번째 페이지 결과를 가져옴 (처음 페이지 로드시)
+        getSearchResults(searchForm.keyword.value, currentPage);
+        updateCurrentPageText();
+        renderPaginationButtons(1); // 초기에 페이지 버튼 생성
     </script>
 </body>
 

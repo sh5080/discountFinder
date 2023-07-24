@@ -84,3 +84,17 @@ body, h1, h2, h3, p, ul, li {
     margin-bottom: 20px;
   }
   
+  /* 스타일 추가 */
+.pagination-buttons button {
+  margin: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  background-color: #f2f2f2;
+  border: none;
+  border-radius: 5px;
+}
+
+.pagination-buttons button.current-page {
+  background-color: #007bff;
+  color: #fff;
+}
