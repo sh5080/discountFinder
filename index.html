@@ -111,58 +111,127 @@
         // 검색 결과를 동적으로 표시하는 함수
         async function getSearchResults(keyword, page) {
             try {
-                const response = await axios.get(`http://localhost:4000/search/naver/${keyword}`, {
+                const naverResponse = await axios.get(`http://localhost:4000/search/naver/${keyword}`, {
                     params: {
                         page: page,
                         pageSize: pageSize
                     },
                     withCredentials: true
                 });
+                const st11Response = await axios.get(`http://localhost:4000/search/11st/${keyword}`, {
+                    params: {
+                        page: page,
+                        pageSize: pageSize,
+                    },
+                    withCredentials: true,
+                });
 
-                const products = response.data;
-                renderProducts(products);
+                const naverProducts = naverResponse.data;
+                const st11Products = st11Response.data;
 
+                renderProducts(naverProducts, st11Products);
+                console.log('naver: ', naverResponse)
+                console.log('11st: ', st11Response)
             } catch (error) {
                 console.error('데이터를 가져오는 중 오류 발생:', error);
             }
         }
 
-        function renderProducts(products) {
+        // function renderProducts(naverProducts, st11Products) {
+        //     productContainer.innerHTML = '';
+
+        //     naverProducts.forEach((product) => {
+        //         const productCard = document.createElement('div');
+        //         productCard.classList.add('product-card');
+
+        //         const productImage = document.createElement('img');
+        //         productImage.src = product.image;
+        //         productImage.alt = product.title;
+        //         productImage.classList.add('product-image');
+
+        //         const productTitle = document.createElement('div');
+        //         productTitle.classList.add('product-title');
+        //         productTitle.textContent = product.title.replace(/<\/?b>/g, '');
+
+        //         const productPrice = document.createElement('div');
+        //         productPrice.classList.add('product-price');
+        //         productPrice.textContent = `최저가 ${product.lprice}원`;
+
+        //         const productDescription = document.createElement('div');
+        //         productDescription.classList.add('product-description');
+        //         productDescription.textContent = product.description;
+
+        //         const productLink = document.createElement('a');
+        //         productLink.href = product.link;
+        //         productLink.textContent = '상품 보러가기';
+        //         productLink.target = '_blank';
+
+        //         productCard.appendChild(productImage);
+        //         productCard.appendChild(productTitle);
+        //         productCard.appendChild(productPrice);
+        //         productCard.appendChild(productDescription);
+        //         productCard.appendChild(productLink);
+
+        //         productContainer.appendChild(productCard);
+        //     });
+        // }
+        function renderProducts(naverProducts, st11Products) {
             productContainer.innerHTML = '';
 
-            products.forEach((product) => {
-                const productCard = document.createElement('div');
-                productCard.classList.add('product-card');
-
-                const productImage = document.createElement('img');
-                productImage.src = product.image;
-                productImage.alt = product.title;
-                productImage.classList.add('product-image');
-
-                const productTitle = document.createElement('div');
-                productTitle.classList.add('product-title');
-                productTitle.textContent = product.title.replace(/<\/?b>/g, '');
-
-                const productPrice = document.createElement('div');
-                productPrice.classList.add('product-price');
-                productPrice.textContent = `최저가 ${product.lprice}원`;
-
-                const productDescription = document.createElement('div');
-                productDescription.classList.add('product-description');
-                productDescription.textContent = product.description;
-
-                const productLink = document.createElement('a');
-                productLink.href = product.link;
-                productLink.textContent = '상품 보러가기';
-                productLink.target = '_blank';
-
-                productCard.appendChild(productImage);
-                productCard.appendChild(productTitle);
-                productCard.appendChild(productPrice);
-                productCard.appendChild(productDescription);
-                productCard.appendChild(productLink);
-
+            naverProducts.forEach((product) => {
+                const productCard = createProductCard(product);
                 productContainer.appendChild(productCard);
+            });
+
+            st11Products.forEach((product) => {
+                const productCard = createProductCard(product);
+                productContainer.appendChild(productCard);
+            });
+        }
+        function createProductCard(product, apiType) {
+            const productCard = document.createElement('div');
+            productCard.classList.add('product-card');
+
+            const productImage = document.createElement('img');
+            productImage.src = apiType === 'naver' ? product.image : product.ProductImage[0];
+            productImage.alt = product.title;
+            productImage.classList.add('product-image');
+
+            const productTitle = document.createElement('div');
+            productTitle.classList.add('product-title');
+            productTitle.textContent = apiType === 'naver' ? product.title.replace(/<\/?b>/g, '') : product.ProductName[0];
+
+            const productPrice = document.createElement('div');
+            productPrice.classList.add('product-price');
+            productPrice.textContent = `${apiType === 'naver' ? '네이버' : '11번가'} 최저가 ${apiType === 'naver' ? product.lprice : product.ProductPrice[0]}원`;
+
+            const productDescription = document.createElement('div');
+            productDescription.classList.add('product-description');
+            productDescription.textContent = product.description;
+
+            const productLink = document.createElement('a');
+            productLink.href = apiType === 'naver' ? product.link : product.DetailPageUrl[0];
+            productLink.textContent = '상품 보러가기';
+            productLink.target = '_blank';
+
+            productCard.appendChild(productImage);
+            productCard.appendChild(productTitle);
+            productCard.appendChild(productPrice);
+            productCard.appendChild(productDescription);
+            productCard.appendChild(productLink);
+
+            productContainer.appendChild(productCard);
+        }
+
+        function renderProducts(naverProducts, st11Products) {
+            productContainer.innerHTML = '';
+
+            naverProducts.forEach((product) => {
+                createProductCard(product, 'naver');
+            });
+
+            st11Products.forEach((product) => {
+                createProductCard(product, '11st');
             });
         }
 
